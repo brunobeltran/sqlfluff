@@ -1044,7 +1044,11 @@ class ObjectReferenceSegment(BaseSegment):
     def _iter_reference_parts(cls, elem) -> Generator[ObjectReferencePart, None, None]:
         """Extract the elements of a reference and yield."""
         # trim on quotes and split out any dots.
-        for part in elem.raw_trimmed().split("."):
+        raw_contents = elem.raw_trimmed()
+        if {"double_quote", "quoted_identifier"}.issubset(elem.class_types):
+            yield cls.ObjectReferencePart(raw_contents, [elem])
+            return
+        for part in raw_contents.split("."):
             yield cls.ObjectReferencePart(part, [elem])
 
     def iter_raw_references(self) -> Generator[ObjectReferencePart, None, None]:
