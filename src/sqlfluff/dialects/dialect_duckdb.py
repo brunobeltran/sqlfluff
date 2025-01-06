@@ -28,6 +28,8 @@ from sqlfluff.core.parser import (
     SymbolSegment,
     TypedParser,
 )
+from sqlfluff.core.parser.segments.common import WordSegment
+from sqlfluff.core.parser.segments.generator import SegmentGenerator
 from sqlfluff.dialects import dialect_ansi as ansi
 from sqlfluff.dialects import dialect_postgres as postgres
 
@@ -76,6 +78,15 @@ duckdb_dialect.add(
 )
 
 duckdb_dialect.replace(
+    NakedIdentifierSegment=SegmentGenerator(
+        lambda dialect: RegexParser(
+            r"ǂ?[A-Z0-9_]*[A-Z][A-Z0-9_]*",
+            IdentifierSegment,
+            type="naked_identifier",
+            anti_template=r"^(" + r"|".join(dialect.sets("reserved_keywords")) + r")$",
+            casefold=str.upper,
+        )
+    ),
     FunctionNameIdentifierSegment=RegexParser(
         r"[A-Z_][A-Z0-9_$]*",
         CodeSegment,
@@ -171,6 +182,11 @@ duckdb_dialect.patch_lexer_matchers(
                 "quoted_value": (r'"((?:[^"]|"")*)"', 1),
                 "escape_replacements": [(r'""', '"')],
             },
+        ),
+        RegexLexer(
+            "word",
+            r"[ǂ0-9a-zA-Z_]+",
+            WordSegment,
         ),
     ]
 )
