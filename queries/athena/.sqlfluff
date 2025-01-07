@@ -1,0 +1,4 @@
+[sqlfluff]
+dialect = athena
+templater = jinja
+max_line_length = 120

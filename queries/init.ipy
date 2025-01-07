@@ -1,0 +1,2 @@
+import sqlfluff; from sqlfluff.core import FluffConfig, Parser, Lexer, Linter
+from queries.test import *
